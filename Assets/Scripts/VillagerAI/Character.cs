@@ -3,25 +3,24 @@ using System.Collections;
 
 namespace VillagerAI
 {
-	public class Character
-	{
+    public class Character
+    {
         private CharacterBehavior behavior;
         private IClass currentClass;
         private StackStateMachine states;
 
-	    public Character(CharacterBehavior _behavior)
-	    {
+        public Character(CharacterBehavior _behavior)
+        {
             behavior = _behavior;
             states = new StackStateMachine();
-            SetClass(new Builder(this));
-	    }
-	
-	    public void Update()
-	    {
-            currentClass.Update();
+            SetClass(new Farmer(this));
+        }
 
+        public void Update()
+        {
+            currentClass.Update();
             states.Peek().Update();
-	    }
+        }
 
         public DebugText GetDebugText()
         {
@@ -98,5 +97,5 @@ namespace VillagerAI
         {
             currentClass.GetResources();
         }
-	}
+    }
 }

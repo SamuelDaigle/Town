@@ -5,28 +5,25 @@ using System.Collections.Generic;
 
 namespace VillagerAI
 {
-    public class CharacterBehavior : MonoBehaviour
+    public class CharacterBehavior : Pathfinding // and MonoBehavior
     {
         public GameObject debugText;
 
         private TextMesh textMesh;
         private Character character;
         private Transform target;
-        private Pathfinding pathfinding;
 
         // Use this for initialization
         void Start()
         {
-            character = new Character(this);
             textMesh = debugText.GetComponent<TextMesh>();
-            pathfinding = GetComponent<Pathfinding>();
+            character = new Character(this);
         }
 
         // Update is called once per frame
         void Update()
         {
             character.Update();
-
             ShowDebug();
         }
 
@@ -42,8 +39,10 @@ namespace VillagerAI
             Debug.Assert(target != null);
             /*Vector3 direction = (target.position - transform.position).normalized;
             transform.Translate(direction * Time.deltaTime);*/
-            pathfinding.FindPath(transform.position, target.position);
-            pathfinding.Move();
+            if (Path.Count != 0)
+            {
+                Move();
+            }
         }
 
         public Transform GetTransform()
@@ -62,6 +61,7 @@ namespace VillagerAI
             {
                 target = sortedTargets[0].transform;
             }
+            FindPath(transform.position, target.position);
         }
 
         public Transform GetTarget()

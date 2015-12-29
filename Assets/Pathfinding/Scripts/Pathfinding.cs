@@ -10,9 +10,12 @@ public enum PathfinderType
 
 public class Pathfinding : MonoBehaviour 
 {
+    public float CharacterSpeed = 5f;
     public List<Vector3> Path = new List<Vector3>();
     public PathfinderType PathType = PathfinderType.GridBased;
 	public bool JS = false;
+
+    private const float TOLERANCE_DISTANCE = 1f;
 
     public void FindPath(Vector3 startPosition, Vector3 endPosition)
     {
@@ -46,8 +49,8 @@ public class Pathfinding : MonoBehaviour
     {
         if (Path.Count > 0)
         {
-            transform.position = Vector3.MoveTowards(transform.position, Path[0], Time.deltaTime * 30F);
-            if (Vector3.Distance(transform.position, Path[0]) < 0.4F)
+            transform.position = Vector3.MoveTowards(transform.position, Path[0], Time.deltaTime * CharacterSpeed);
+            if (Vector3.Distance(transform.position, Path[0]) < TOLERANCE_DISTANCE)
             {
                 Path.RemoveAt(0);
             }
