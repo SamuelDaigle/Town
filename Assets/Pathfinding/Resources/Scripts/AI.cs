@@ -5,7 +5,6 @@ public class AI : Pathfinding
 {
 
     public Transform player;
-    private CharacterController controller;
     private bool newPath = true;
     private bool moving = false;
     private GameObject[] AIList;
