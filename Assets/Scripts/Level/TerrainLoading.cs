@@ -8,6 +8,7 @@ public class TerrainLoading : MonoBehaviour
     public float WaveLength = 1f;
 
     private Terrain terrain;
+    private float[,] heights;
     private int sizeX;
     private int sizeY;
 
@@ -16,65 +17,62 @@ public class TerrainLoading : MonoBehaviour
         terrain = Terrain.activeTerrain;
         sizeX = terrain.terrainData.heightmapWidth;
         sizeY = terrain.terrainData.heightmapHeight;
+        heights = GetTerrainHeights();
+        sizeX--; sizeY--; // for further loops.
 
         RaiseTerrain();
         CreateMountains();
+
+        SetTerrainHeights(heights);
     }
 
     private void RaiseTerrain()
     {
         Debug.Log("Raising Terrain..");
-        // get the heights of the terrain under this game object
-        float[,] heights = GetTerrainHeights();
-
-        // we set each sample of the terrain in the size to the desired height
         for (int x = 0; x < sizeX; x++)
         {
             for (int y = 0; y < sizeY; y++)
             {
-                heights[y, x] += Amplitude;
+                heights[y, x] = 0;
             }
         }
-
-        SetTerrainHeights(heights);
     }
 
     private void CreateMountains()
     {
-        int nbMountains = Random.Range(0, 5);
-        Debug.Log("Creating " + nbMountains + " Mountains..");
+        Debug.Log("Started creating mountains..");
+        SetEmptyHeight(0, 0, 0.02f);
+        SetEmptyHeight(0, sizeY, 0.02f);
+        SetEmptyHeight(sizeX, 0, 0.02f);
+        SetEmptyHeight(sizeX, sizeY, 0.02f);
+        DiamondSquare(0, 0, sizeX, sizeY, 0.1f);
+        Debug.Log("Done.");
+    }
 
-        List<Vector2> mountainPositions = new List<Vector2>();
-        for (int i = 0; i < nbMountains; i++)
+    private void DiamondSquare(int _left, int _top, int _right, int _bottom, float base_height)
+    {
+        Debug.Log("A mountain as been created.");
+        // Set the Center point of the Diamond step.
+        int xCenter = (int)Mathf.Floor(_left + _right) / 2;
+        int yCenter = (int)Mathf.Floor(_top + _bottom) / 2;
+        float centerPointHeight = (GetHeight(_left, _top) + GetHeight(_right, _top) + GetHeight(_left, _bottom) + GetHeight(_right, _bottom)) / 4;
+        SetEmptyHeight(xCenter, yCenter, centerPointHeight);
+
+        // Set the four corners of the Square step.
+        SetEmptyHeight(xCenter, _top, GetHeight(_left, _top) + GetHeight(_right, _top) / 2 + (Random.value - 0.5f) * base_height);
+        SetEmptyHeight(xCenter, _bottom, GetHeight(_left, _bottom) + GetHeight(_right, _bottom) / 2 + (Random.value - 0.5f) * base_height);
+        SetEmptyHeight(_left, yCenter, GetHeight(_left, _top) + GetHeight(_left, _bottom) / 2 + (Random.value - 0.5f) * base_height);
+        SetEmptyHeight(_right, yCenter, GetHeight(_right, _top) + GetHeight(_right, _bottom) / 2 + (Random.value - 0.5f) * base_height);
+
+        // Call smaller regions.
+        if ((_right - _left) > 16)
         {
-            Vector2 position;
-            position.x = Random.Range(0, sizeX);
-            position.y = Random.Range(0, sizeY);
-            mountainPositions.Add(position);
+            base_height = base_height * Mathf.Pow(2f, -0.75f);
+            DiamondSquare(_left, _top, xCenter, yCenter, base_height);
+            DiamondSquare(xCenter, _top, _right, yCenter, base_height);
+            DiamondSquare(_left, yCenter, xCenter, _bottom, base_height);
+            DiamondSquare(xCenter, yCenter, _right, _bottom, base_height);
         }
-
-        float[,] heights = GetTerrainHeights();
-
-        foreach (Vector2 mountainPosition in mountainPositions)
-        {
-            int x = (int)mountainPosition.x;
-            int y = (int)mountainPosition.y;
-
-            int mountainSize = Random.Range(15, 50);
-
-            for (int i = x - mountainSize; i < x + mountainSize; i++)
-            {
-                for (int j = y - mountainSize; j < y + mountainSize; j++)
-                {
-                    if (j > 0 && j < sizeY && i > 0 && i < sizeX)
-                    {
-                        heights[j, i] += 0.05f;
-                    }
-                }
-            }
-        }
-
-        SetTerrainHeights(heights);
     }
 
     private float[,] GetTerrainHeights()
@@ -85,5 +83,18 @@ public class TerrainLoading : MonoBehaviour
     private void SetTerrainHeights(float[,] _heights)
     {
         terrain.terrainData.SetHeights(0, 0, _heights);
+    }
+
+    private float GetHeight(int _x, int _y)
+    {
+        return heights[_y, _x];
+    }
+
+    private void SetEmptyHeight(int _x, int _y, float _value)
+    {
+        if (heights[_y, _x] == 0)
+        {
+            heights[_y, _x] = _value / 3;
+        }
     }
 }

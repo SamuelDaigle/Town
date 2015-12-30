@@ -4,7 +4,6 @@ namespace Assets.Scripts.LevelComponents.Terrains
 {
     public class TerrainRestore : MonoBehaviour
     {
-        private float[,] oldTerrain;
         private Terrain terrain;
         private int terrainWidth;
         private int terrainHeight;
@@ -14,24 +13,28 @@ namespace Assets.Scripts.LevelComponents.Terrains
             terrain = Terrain.activeTerrain;
             terrainWidth = terrain.terrainData.heightmapWidth;
             terrainHeight = terrain.terrainData.heightmapHeight;
-            oldTerrain = terrain.terrainData.GetHeights(0, 0, terrainWidth, terrainHeight);
         }
 
-        void OnDestroy()
+        void Update()
         {
-            RestoreTerrain();
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                RestoreTerrain();
+            }
         }
 
         public void RestoreTerrain()
         {
-            // Don't reset the terrain if it hasn't changed.
-            if (oldTerrain != null && terrain != null)
+            Debug.Log("Restored terrain.");
+            float[,] heights = terrain.terrainData.GetHeights(0, 0, terrainWidth, terrainHeight);
+            for (int i = 0; i < terrainWidth; i++)
             {
-                if (oldTerrain != terrain.terrainData.GetHeights(0, 0, terrainWidth, terrainHeight))
+                for (int j = 0; j < terrainHeight; j++)
                 {
-                    terrain.terrainData.SetHeights(0, 0, oldTerrain);
+                    heights[j, i] = 0;
                 }
             }
+            terrain.terrainData.SetHeights(0, 0, heights);
         }
     }
 }
