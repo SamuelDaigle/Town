@@ -43,10 +43,12 @@ public class TerrainLoading : MonoBehaviour
     private void CreateMountains()
     {
         Debug.Log("Started creating mountains..");
-        SetEmptyHeight(0, 0, 0.02f);
-        SetEmptyHeight(0, sizeY, 0.02f);
-        SetEmptyHeight(sizeX, 0, 0.02f);
-        SetEmptyHeight(sizeX, sizeY, 0.02f);
+        float min = 0f;
+        float max = 0.1f;
+        SetEmptyHeight(0, 0, Random.Range(min, max));
+        SetEmptyHeight(0, sizeY, Random.Range(min, max));
+        SetEmptyHeight(sizeX, 0, Random.Range(min, max));
+        SetEmptyHeight(sizeX, sizeY, Random.Range(min, max));
         DiamondSquare(0, 0, sizeX, sizeY, 1f, MAX_RECURSIVE_LEVEL);
         Debug.Log("Done.");
     }
@@ -62,10 +64,10 @@ public class TerrainLoading : MonoBehaviour
         SetEmptyHeight(xCenter, yCenter, centerPointHeight);
 
         // Set the four corners of the Square step.
-        SetEmptyHeight(xCenter, _top, (GetHeight(_left, _top) + GetHeight(_right, _top)) / 2);
-        SetEmptyHeight(xCenter, _bottom, (GetHeight(_left, _bottom) + GetHeight(_right, _bottom)) / 2);
-        SetEmptyHeight(_left, yCenter, (GetHeight(_left, _top) + GetHeight(_left, _bottom)) / 2);
-        SetEmptyHeight(_right, yCenter, (GetHeight(_right, _top) + GetHeight(_right, _bottom)) / 2);
+        SetEmptyHeight(xCenter, _top, (GetHeight(_left, _top) + GetHeight(_right, _top)) / 2 + Random.Range(0, 0.001f));
+        SetEmptyHeight(xCenter, _bottom, (GetHeight(_left, _bottom) + GetHeight(_right, _bottom)) / 2 + Random.Range(0, 0.001f));
+        SetEmptyHeight(_left, yCenter, (GetHeight(_left, _top) + GetHeight(_left, _bottom)) / 2 + Random.Range(0, 0.001f));
+        SetEmptyHeight(_right, yCenter, (GetHeight(_right, _top) + GetHeight(_right, _bottom)) / 2 + Random.Range(0, 0.001f));
 
         // Call smaller regions.
         DiamondSquare(_left, _top, xCenter, yCenter, base_height, _recursiveLevel - 1);
@@ -93,7 +95,7 @@ public class TerrainLoading : MonoBehaviour
     {
         if (heights[_y, _x] == 0)
         {
-            heights[_y, _x] = _value + Random.RandomRange(0, 0.001f);
+            heights[_y, _x] = _value;
         }
     }
 }
