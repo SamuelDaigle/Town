@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 public class TerrainLoading : MonoBehaviour
 {
-    public float Amplitude = 0.001f;
-    public float WaveLength = 1f;
+    public float Amplitude = 3f;
 
     private Terrain terrain;
     private float[,] heights;
@@ -43,13 +42,13 @@ public class TerrainLoading : MonoBehaviour
     private void CreateMountains()
     {
         Debug.Log("Started creating mountains..");
-        float min = 0f;
-        float max = 0.1f;
+        float min = 0.05f;
+        float max = 0.05f;
         SetEmptyHeight(0, 0, Random.Range(min, max));
         SetEmptyHeight(0, sizeY, Random.Range(min, max));
         SetEmptyHeight(sizeX, 0, Random.Range(min, max));
         SetEmptyHeight(sizeX, sizeY, Random.Range(min, max));
-        DiamondSquare(0, 0, sizeX, sizeY, 1f, MAX_RECURSIVE_LEVEL);
+        DiamondSquare(0, 0, sizeX, sizeY, 0.001f, MAX_RECURSIVE_LEVEL);
         Debug.Log("Done.");
     }
 
@@ -61,13 +60,13 @@ public class TerrainLoading : MonoBehaviour
         int xCenter = (int)Mathf.Floor(_left + _right) / 2;
         int yCenter = (int)Mathf.Floor(_top + _bottom) / 2;
         float centerPointHeight = (GetHeight(_left, _top) + GetHeight(_right, _top) + GetHeight(_left, _bottom) + GetHeight(_right, _bottom)) / 4;
-        SetEmptyHeight(xCenter, yCenter, centerPointHeight);
+        SetEmptyHeight(xCenter, yCenter, centerPointHeight + ((Random.value - 0.5f) * base_height * Mathf.Pow(_recursiveLevel, Amplitude)));
 
         // Set the four corners of the Square step.
-        SetEmptyHeight(xCenter, _top, (GetHeight(_left, _top) + GetHeight(_right, _top)) / 2 + Random.Range(0, 0.001f));
-        SetEmptyHeight(xCenter, _bottom, (GetHeight(_left, _bottom) + GetHeight(_right, _bottom)) / 2 + Random.Range(0, 0.001f));
-        SetEmptyHeight(_left, yCenter, (GetHeight(_left, _top) + GetHeight(_left, _bottom)) / 2 + Random.Range(0, 0.001f));
-        SetEmptyHeight(_right, yCenter, (GetHeight(_right, _top) + GetHeight(_right, _bottom)) / 2 + Random.Range(0, 0.001f));
+        SetEmptyHeight(xCenter, _top, (GetHeight(_left, _top) + GetHeight(_right, _top)) / 2);
+        SetEmptyHeight(xCenter, _bottom, (GetHeight(_left, _bottom) + GetHeight(_right, _bottom)) / 2);
+        SetEmptyHeight(_left, yCenter, (GetHeight(_left, _top) + GetHeight(_left, _bottom)) / 2);
+        SetEmptyHeight(_right, yCenter, (GetHeight(_right, _top) + GetHeight(_right, _bottom)) / 2);
 
         // Call smaller regions.
         DiamondSquare(_left, _top, xCenter, yCenter, base_height, _recursiveLevel - 1);
